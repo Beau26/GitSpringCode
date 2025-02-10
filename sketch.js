@@ -3,6 +3,16 @@ let tileMap = []; //array to store tiles in
 let tilesX = 10; //number of tiles on the x axis
 let tilesY = 10; //number of tiles on the y axis
 let tileSize = 50; //the size of the tiles
+let grassTile;
+let stoneTile;
+
+
+function preload(){
+  grassTile = loadImage("grassy.png")
+  stoneTile = loadImage("stone.png")
+   
+}
+
 
 function setup() {
   createCanvas(500,500);
@@ -67,22 +77,11 @@ class Tile {
     textSize(10)
     text("ID: " + this.tileID, this.xPos + xPadding, this.yPos + yIDPadding)
 
-    //create rect around tile
-    noFill()
-    stroke(121,51,255)
-    rect(this.xPos, this.yPos, this.tileSize)
+    image(grassTile,this.xPos,this.yPos)
   }
 
   displayMessage(){
-    //padding for the assessed message
-    let xPadding = 2; 
-    let yPadding = 40;
-
     //text settings for the assessed message
-    strokeWeight(1)
-    stroke("black")
-    fill(255,28,143)
-    textSize(10)
-    text("Assessed!", this.xPos + xPadding, this.yPos + yPadding)
+    image(stoneTile,this.xPos,this.yPos)
   }
 }
