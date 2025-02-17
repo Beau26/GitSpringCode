@@ -1,31 +1,64 @@
-//GLOBAL VARIABLES
+//INITIALISE PLAYER VARIABLES
+let player;
+let playerSprite;
+let playerSpeed = 5;
+
+//INITIALISE TILEMAP VARIABLES
 let tileMap = []; //array to store tiles in
 let tilesX = 10; //number of tiles on the x axis
 let tilesY = 10; //number of tiles on the y axis
 let tileSize = 50; //the size of the tiles
-let grassTile;
-let stoneTile;
+let textures = [];
+
+let graphicsMap = [[0,0,0,0,0,0,0,0,0,1],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,1,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,1,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0,0,0],
+                  [0,1,0,0,0,0,0,0,0,0]]
+let tileRules = [[0,0,0,0,0,0,0,0,0,1],
+                [0,0,0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0,0,0],
+                [0,0,1,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,1,0,0],
+                [0,0,0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0,0,0],
+                [0,1,0,0,0,0,0,0,0,0]]
 
 
 function preload(){
-  grassTile = loadImage("grassy.png")
-  stoneTile = loadImage("stone.png")
+  textures[0] = loadImage("grassy.png")
+  textures[1] = loadImage("stone.png")
+  playerSprite = loadImage("librarian-bw.png")
    
 }
 
 
 function setup() {
   createCanvas(500,500);
+
+  //CREATING TILEMAP
   let tileID = 0; // ID number for a specific tile
   //nested loop that creates the tile map 
   for (let tileX = 0; tileX < tilesX; tileX++){
     tileMap[tileX] = [] //creates an empty column on the tilemap
     for (let tileY = 0; tileY < tilesY; tileY++){
+      //Set the texture for the tile
+      let texture = graphicsMap[tileY][tileX]
+      console.log(graphicsMap[tileY][tileX])
       //creates a new tile from the tile class and puts it in the current column
-      tileMap[tileX][tileY] = new Tile(tileX,tileY,tileSize,tileID)
+      tileMap[tileX][tileY] = new Tile(textures[texture],tileX,tileY,tileSize,tileID)
       tileID++ //increments the tile id for the next tile
     }
   }
+
+  player = new Player(playerSprite, 3, 3, tileSize,tileRules)
 }
 
 function draw() {
@@ -34,20 +67,18 @@ function draw() {
   //displays all of the tiles
   for (let tileX = 0; tileX < tilesX; tileX++){
     for (let tileY = 0; tileY < tilesY; tileY++){
-      tileMap[tileX][tileY].debugGrid()
+      tileMap[tileX][tileY].display()
     }
   }
 
   //displays a message in each of the selected tiles
-  tileMap[5][6].displayMessage()
-  tileMap[0][8].displayMessage()
-  tileMap[3][4].displayMessage()
-  tileMap[3][0].displayMessage()
 }
 
 //creates the tile class
 class Tile {
-  constructor(tileX, tileY, tileSize, tileID){
+  constructor(texture,tileX, tileY, tileSize, tileID){
+    //tile texture
+    this.texture = texture;
     //position on tile map
     this.tileX = tileX;
     this.tileY = tileY;
@@ -59,6 +90,10 @@ class Tile {
     this.tileID = tileID; //sets the tileID number
   }
 
+  display(){
+    noStroke()
+    image(this.texture,this.xPos,this.yPos,this.tileSize,this.tileSize)
+  }
   debugGrid(){
     let xPadding = 2; //padding for x values
     let yCoordinatePadding = 8; //padding for the y for the coordinate value
@@ -77,11 +112,84 @@ class Tile {
     textSize(10)
     text("ID: " + this.tileID, this.xPos + xPadding, this.yPos + yIDPadding)
 
-    image(grassTile,this.xPos,this.yPos)
+    //image(grassTile,this.xPos,this.yPos)
   }
 
   displayMessage(){
     //text settings for the assessed message
     image(stoneTile,this.xPos,this.yPos)
+  }
+}
+
+class Player {
+  constructor(sprite,startX,startY,tileSize,tileRule){
+    //sprite
+    this.sprite = sprite;
+
+    //tile position
+    this.tileX = startX;
+    this.tileY = startY;
+
+    //tile data
+    this.tileSize = tileSize;
+    this.tileRules = tileRule
+
+    //coordinates of player on grid
+    this.xPos = startX * size;
+    this.yPos = startY * size;
+
+    //target pisition on grid
+    this.tx = this.xPos;
+    this.ty = this.yPos;
+
+    //direction
+    this.dirX = 0;
+    this.dirY = 0;
+
+    //movement
+    this.isMoving = false;
+    this.speed = 5
+
+  }
+
+  setDirection(){
+    let up = 87;    //w
+    let down = 83;    //s
+    let left = 65;    //a
+    let right = 68    //d
+
+    if (this.isMoving == false){
+
+      //moves up
+      if (keyIsDown(up)){
+        this.dirX = 0;
+        this.dirY = -1;
+      }
+
+      //moves down
+      if (keyIsDown(down)){
+        this.dirX = 0;
+        this.dirY = 1;
+      }
+
+      //moves left
+      if (keyIsDown(left)){
+        this.dirX = 1;
+        this.dirY = 0;
+      }
+
+      //moves down
+      if (keyIsDown(right)){
+        this.dirX = -1;
+        this.dirY = 0;
+      }
+
+      //checks target tile
+      this.checkTargetTile()
+    }
+  }
+
+  checkTargetTile(){
+    
   }
 }
