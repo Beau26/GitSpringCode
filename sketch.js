@@ -8,7 +8,7 @@ let tileMap = []; //array to store tiles in
 let tilesX = 10; //number of tiles on the x axis
 let tilesY = 10; //number of tiles on the y axis
 let tileSize = 50; //the size of the tiles
-let textures = [];
+let textures = []; //value to store textures
 
 let graphicsMap = [[0,0,0,0,0,0,0,0,0,1],
                   [0,0,0,0,0,0,0,0,0,0],
@@ -33,8 +33,11 @@ let tileRules = [[0,0,0,0,0,0,0,0,0,1],
 
 
 function preload(){
+  //tilemap textures
   textures[0] = loadImage("grassy.png")
   textures[1] = loadImage("stone.png")
+
+  //sprite
   playerSprite = loadImage("librarian-bw.png")
    
 }
@@ -45,20 +48,22 @@ function setup() {
 
   //CREATING TILEMAP
   let tileID = 0; // ID number for a specific tile
+
   //nested loop that creates the tile map 
   for (let tileX = 0; tileX < tilesX; tileX++){
     tileMap[tileX] = [] //creates an empty column on the tilemap
     for (let tileY = 0; tileY < tilesY; tileY++){
+      
       //Set the texture for the tile
       let texture = graphicsMap[tileY][tileX]
-      console.log(graphicsMap[tileY][tileX])
       //creates a new tile from the tile class and puts it in the current column
       tileMap[tileX][tileY] = new Tile(textures[texture],tileX,tileY,tileSize,tileID)
+
       tileID++ //increments the tile id for the next tile
     }
   }
 
-  player = new Player(playerSprite, 3, 3, tileSize,tileRules)
+  player = new Player(playerSprite, 3, 3, tileSize,tileRules);
 }
 
 function draw() {
@@ -70,6 +75,11 @@ function draw() {
       tileMap[tileX][tileY].display()
     }
   }
+
+  player.display();
+
+  player.setDirection();
+  player.move();
 
   //displays a message in each of the selected tiles
 }
@@ -135,8 +145,8 @@ class Player {
     this.tileRules = tileRule
 
     //coordinates of player on grid
-    this.xPos = startX * size;
-    this.yPos = startY * size;
+    this.xPos = startX * tileSize;
+    this.yPos = startY * tileSize;
 
     //target pisition on grid
     this.tx = this.xPos;
@@ -152,13 +162,17 @@ class Player {
 
   }
 
+  display(){
+    image(this.sprite,this.xPos,this.yPos,this.tileSize,this.tileSize);
+  }
+
   setDirection(){
     let up = 87;    //w
     let down = 83;    //s
     let left = 65;    //a
     let right = 68    //d
 
-    if (this.isMoving == false){
+    if (!this.isMoving){
 
       //moves up
       if (keyIsDown(up)){
@@ -174,13 +188,13 @@ class Player {
 
       //moves left
       if (keyIsDown(left)){
-        this.dirX = 1;
+        this.dirX = -1;
         this.dirY = 0;
       }
 
       //moves down
       if (keyIsDown(right)){
-        this.dirX = -1;
+        this.dirX = 1;
         this.dirY = 0;
       }
 
@@ -190,6 +204,50 @@ class Player {
   }
 
   checkTargetTile(){
+
+    //calculate current position
+    this.tileX = Math.floor(this.xPos / this.tileSize);
+    this.tileY = Math.floor(this.yPos / this.tileSize);
     
+    //calculate next tile
+    let nextTileX = this.tileX + this.dirX;
+    let nextTileY = this.tileY + this.dirY;
+
+    //Sets bounds for the border of the map
+    if (nextTileX >= 0 &&        //left
+        nextTileX < tilesX &&    //right
+        nextTileY >= 0 &&        //top
+        nextTileY < tilesY){     //bottom
+
+          //checks if next tile is not walkable
+          if (tileRules[nextTileY][nextTileX] != 1){
+            //next pixel positions
+            this.tx = nextTileX * tileSize;
+            this.ty = nextTileY * tileSize;
+
+            //starts movement
+            this.isMoving = true;
+          }
+
+
+    }
+
+  }
+
+  move(){
+
+    //moves player
+    if (this.isMoving){
+      this.xPos += this.speed * this.dirX;
+      this.yPos += this.speed * this.dirY;
+    }
+
+    //stops moving player
+    if (this.xPos === this.tx && this.yPos === this.ty){
+      this.isMoving = false;
+      this.dirX = 0
+      this.dirY = 0
+
+    }
   }
 }
