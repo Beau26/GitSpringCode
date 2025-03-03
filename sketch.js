@@ -10,32 +10,131 @@ let tilesY = 10; //number of tiles on the y axis
 let tileSize = 50; //the size of the tiles
 let textures = []; //value to store textures
 
-let graphicsMap = [[0,0,0,0,0,0,0,0,0,1],
-                  [0,0,0,0,0,0,0,0,0,0],
-                  [0,0,0,0,0,0,0,0,0,0],
-                  [0,0,0,0,0,0,0,0,0,0],
-                  [0,0,1,0,0,0,0,0,0,0],
-                  [0,0,0,0,0,0,0,0,0,0],
-                  [0,0,0,0,0,0,0,1,0,0],
-                  [0,0,0,0,0,0,0,0,0,0],
-                  [0,0,0,0,0,0,0,0,0,0],
-                  [0,1,0,0,0,0,0,0,0,0]]
-let tileRules = [[0,0,0,0,0,0,0,0,0,1],
-                [0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0],
-                [0,0,1,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,1,0,0],
-                [0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0],
-                [0,1,0,0,0,0,0,0,0,0]]
+//LEVEL DATA OBJECTS
+
+let level0 = {
+
+  graphicsMap: [
+  //       2nd Value (x)
+// 0  1  2  3  4  5  6  7  8  9
+  [0, 0, 0, 0, 0, 0, 0, 2, 3, 2], //0
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //1
+  [0, 0, 0, 1, 0, 0, 0, 0, 0, 0], //2
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //3
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //4   1st VALUE (y)
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //5
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //6
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //7
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //8
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  //9
+],
+
+  tileRules: [
+   //       2nd Value (x)
+  // 0  1  2  3  4  5  6  7  8  9
+    [0, 0, 0, 0, 0, 0, 0, 1, 2, 1], //0
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //1
+    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0], //2
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //3
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //4   1st VALUE (y)
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //5
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //6
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //7
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //8
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  //9
+  ],
+
+  startTileX: 8, //X position to start the player
+  startTileY: 1  //y posision to start the player
+
+}
+
+let level1 = {
+    graphicsMap: [
+    //         2nd VALUE (x)  
+    //    0  1  2  3  4  5  6  7  8  9
+        [4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // 0
+        [4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // 1
+        [4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // 2 
+        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], // 3
+        [2, 4, 4, 4, 4, 4, 4, 4, 4, 2], // 4 
+        [2, 4, 4, 4, 4, 4, 4, 4, 4, 3], // 5
+        [2, 4, 4, 4, 4, 4, 4, 4, 4, 2], // 6
+        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], // 7
+        [4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // 8
+        [4, 4, 4, 4, 4, 4, 4, 4, 4, 4]  // 9
+    ],
+
+    tileRules: [
+    //         2nd VALUE (x)  
+    //   0  1  2  3  4  5  6  7  8  9
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 1
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 2 
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 3
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 4  1st VALUE (y)
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 2], // 5
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 6
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 7
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 8
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 9
+    ],
+
+    startTileX: 1, //Sets X tile to start player on
+    startTileY: 5  //Sets Y tile to start player on
+}
+
+let level2 = {
+
+    graphicsMap: [ 
+    //              2nd Value (x)
+    //   0  1  2  3  4  5  6  7  8  9 
+        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], // 0
+        [2, 4, 4, 4, 4, 4, 4, 4, 4, 2], // 1
+        [2, 4, 2, 4, 4, 4, 4, 4, 4, 2], // 2
+        [2, 4, 4, 4, 4, 4, 4, 2, 4, 2], // 3
+        [2, 4, 4, 4, 4, 4, 4, 4, 4, 2], // 4    1st Value (y)
+        [2, 4, 2, 4, 4, 4, 4, 4, 4, 2], // 5
+        [2, 4, 4, 4, 4, 4, 4, 4, 4, 2], // 6
+        [2, 4, 4, 4, 4, 4, 2, 2, 4, 2], // 7
+        [2, 4, 4, 4, 4, 4, 4, 4, 4, 2], // 8
+        [2, 2, 3, 2, 2, 2, 2, 2, 2, 2]  // 9
+    ],
+
+    tileRules: [ 
+    //              2nd Value (x)
+    //   0  1  2  3  4  5  6  7  8  9 
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 1
+        [1, 0, 1, 0, 0, 0, 0, 0, 0, 1], // 2
+        [1, 0, 0, 0, 0, 0, 0, 1, 0, 1], // 3
+        [1, 0, 0, 0, 0, 1, 0, 0, 0, 1], // 4    1st Value (y)
+        [1, 0, 1, 0, 0, 0, 0, 0, 0, 1], // 5
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 6
+        [1, 0, 0, 0, 0, 0, 1, 1, 0, 1], // 7
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 8
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 9
+    ],
+
+    startTileX: 2, //Sets X tile to start player on
+    startTileY: 8  //Sets Y tile to start player on
+
+}
+
+
+let levels = [level0,level1,level2];
+let currentLevel = 0;
+let graphicsMap;
+let tileRules;
 
 
 function preload(){
   //tilemap textures
   textures[0] = loadImage("grassy.png")
   textures[1] = loadImage("stone.png")
+  textures[2] = loadImage("wall_50x.png")
+  textures[3] = loadImage("door.png")
+  textures[4] = loadImage("void_50x.png")
 
   //sprite
   playerSprite = loadImage("librarian-bw.png")
@@ -46,24 +145,31 @@ function preload(){
 function setup() {
   createCanvas(500,500);
 
+  loadLevel();
+
+  player = new Player(playerSprite, 3, 3, tileSize,tileRules);
+}
+
+function loadLevel() {
+  graphicsMap = levels[currentLevel].graphicsMap
+  tileRules = levels[currentLevel].tileRules
+
   //CREATING TILEMAP
   let tileID = 0; // ID number for a specific tile
 
   //nested loop that creates the tile map 
-  for (let tileX = 0; tileX < tilesX; tileX++){
-    tileMap[tileX] = [] //creates an empty column on the tilemap
-    for (let tileY = 0; tileY < tilesY; tileY++){
-      
-      //Set the texture for the tile
-      let texture = graphicsMap[tileY][tileX]
-      //creates a new tile from the tile class and puts it in the current column
-      tileMap[tileX][tileY] = new Tile(textures[texture],tileX,tileY,tileSize,tileID)
+  for (let tileX = 0; tileX < tilesX; tileX++) {
+    tileMap[tileX] = []; //creates an empty column on the tilemap
+    for (let tileY = 0; tileY < tilesY; tileY++) {
 
-      tileID++ //increments the tile id for the next tile
+      //Set the texture for the tile
+      let texture = graphicsMap[tileY][tileX];
+      //creates a new tile from the tile class and puts it in the current column
+      tileMap[tileX][tileY] = new Tile(textures[texture], tileX, tileY, tileSize, tileID);
+
+      tileID++;
     }
   }
-
-  player = new Player(playerSprite, 3, 3, tileSize,tileRules);
 }
 
 function draw() {
@@ -219,8 +325,15 @@ class Player {
         nextTileY >= 0 &&        //top
         nextTileY < tilesY){     //bottom
 
+          if (tileRules[nextTileY][nextTileX] === 2){
+            currentLevel ++
+
+            loadLevel()
+            this.setPlayerPosition()
+          }
+
           //checks if next tile is not walkable
-          if (tileRules[nextTileY][nextTileX] != 1){
+          else if (tileRules[nextTileY][nextTileX] != 1){
             //next pixel positions
             this.tx = nextTileX * tileSize;
             this.ty = nextTileY * tileSize;
@@ -228,7 +341,6 @@ class Player {
             //starts movement
             this.isMoving = true;
           }
-
 
     }
 
@@ -249,5 +361,16 @@ class Player {
       this.dirY = 0
 
     }
+  }
+
+  setPlayerPosition(){
+    this.tileX = levels[currentLevel].startTileX
+    this.tileY = levels[currentLevel].startTileY
+
+    this.xPos = this.tileX * tileSize
+    this.yPos = this.tileY * tileSize
+
+    this.dirX = 0
+    this.dirY = 0
   }
 }
