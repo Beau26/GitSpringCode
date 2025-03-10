@@ -44,8 +44,10 @@ let level0 = {
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  //9
   ],
 
-  startTileX: 8, //X position to start the player
-  startTileY: 1  //y posision to start the player
+  startTiles: [
+              [8,1],
+              [8,1]
+            ]
 
 }
 
@@ -58,7 +60,7 @@ let level1 = {
         [4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // 2 
         [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], // 3
         [2, 4, 4, 4, 4, 4, 4, 4, 4, 2], // 4 
-        [2, 4, 4, 4, 4, 4, 4, 4, 4, 3], // 5
+        [3, 4, 4, 4, 4, 4, 4, 4, 4, 3], // 5
         [2, 4, 4, 4, 4, 4, 4, 4, 4, 2], // 6
         [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], // 7
         [4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // 8
@@ -73,15 +75,18 @@ let level1 = {
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 2 
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 3
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 4  1st VALUE (y)
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 2], // 5
+        [3, 0, 0, 0, 0, 0, 0, 0, 0, 2], // 5
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 6
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 7
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 8
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 9
     ],
 
-    startTileX: 1, //Sets X tile to start player on
-    startTileY: 5  //Sets Y tile to start player on
+    startTiles: [
+                [1,5],
+                [8,5]
+              ]
+
 }
 
 let level2 = {
@@ -89,7 +94,7 @@ let level2 = {
     graphicsMap: [ 
     //              2nd Value (x)
     //   0  1  2  3  4  5  6  7  8  9 
-        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], // 0
+        [2, 3, 2, 2, 2, 2, 2, 2, 2, 2], // 0
         [2, 4, 4, 4, 4, 4, 4, 4, 4, 2], // 1
         [2, 4, 2, 4, 4, 4, 4, 4, 4, 2], // 2
         [2, 4, 4, 4, 4, 4, 4, 2, 4, 2], // 3
@@ -104,28 +109,34 @@ let level2 = {
     tileRules: [ 
     //              2nd Value (x)
     //   0  1  2  3  4  5  6  7  8  9 
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
+        [1, 2, 1, 1, 1, 1, 1, 1, 1, 1], // 0
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 1
         [1, 0, 1, 0, 0, 0, 0, 0, 0, 1], // 2
-        [1, 0, 0, 0, 0, 0, 0, 1, 0, 1], // 3
+        [1, 0, 0, 0, 0, 0, 0, 1, 0, 1], // 3d
         [1, 0, 0, 0, 0, 1, 0, 0, 0, 1], // 4    1st Value (y)
         [1, 0, 1, 0, 0, 0, 0, 0, 0, 1], // 5
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 6
         [1, 0, 0, 0, 0, 0, 1, 1, 0, 1], // 7
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 8
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 9
+        [1, 1, 3, 1, 1, 1, 1, 1, 1, 1]  // 9
     ],
 
-    startTileX: 2, //Sets X tile to start player on
-    startTileY: 8  //Sets Y tile to start player on
+    startTiles: [
+                [2,8],
+              ]
 
 }
 
+//Level Control Variables
 
 let levels = [level0,level1,level2];
 let currentLevel = 0;
 let graphicsMap;
 let tileRules;
+
+//timer values
+let count;
+let countMax = 30;
 
 
 function preload(){
@@ -181,7 +192,11 @@ function draw() {
       tileMap[tileX][tileY].display()
     }
   }
-
+  if (player.transition){
+    //called once per frame to make a 30 second timer
+    if (count === countMax) player.transition = false;
+    else count ++
+  }
   player.display();
 
   player.setDirection();
@@ -248,7 +263,8 @@ class Player {
 
     //tile data
     this.tileSize = tileSize;
-    this.tileRules = tileRule
+    this.tileRules = tileRule;
+    this.transition = false;
 
     //coordinates of player on grid
     this.xPos = startX * tileSize;
@@ -310,6 +326,11 @@ class Player {
   }
 
   checkTargetTile(){
+    //checks for transition
+    if (this.transition){
+      this.dirX = 0;
+      this.dirY = 0;
+    }
 
     //calculate current position
     this.tileX = Math.floor(this.xPos / this.tileSize);
@@ -327,9 +348,23 @@ class Player {
 
           if (tileRules[nextTileY][nextTileX] === 2){
             currentLevel ++
-
+            if (currentLevel >= levels.length){
+              currentLevel = 0
+            }
             loadLevel()
-            this.setPlayerPosition()
+            this.setPlayerPosition(0)
+            count = 0;
+            this.transition = true;
+          }
+          
+          else if (tileRules[nextTileY][nextTileX] === 3){
+            currentLevel --
+            
+            console.log(currentLevel)
+            loadLevel()
+            this.setPlayerPosition(1)
+            count = 0;
+            this.transition = true;
           }
 
           //checks if next tile is not walkable
@@ -363,14 +398,11 @@ class Player {
     }
   }
 
-  setPlayerPosition(){
-    this.tileX = levels[currentLevel].startTileX
-    this.tileY = levels[currentLevel].startTileY
+  setPlayerPosition(doorValue){
+    this.tileX = levels[currentLevel].startTiles[doorValue][0]
+    this.tileY = levels[currentLevel].startTiles[doorValue][1]
 
     this.xPos = this.tileX * tileSize
     this.yPos = this.tileY * tileSize
-
-    this.dirX = 0
-    this.dirY = 0
   }
 }
