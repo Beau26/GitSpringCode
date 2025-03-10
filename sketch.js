@@ -10,6 +10,13 @@ let tilesY = 10; //number of tiles on the y axis
 let tileSize = 50; //the size of the tiles
 let textures = []; //value to store textures
 
+//Items and Inventory
+let items = [];
+let itemTextures = [];
+
+let inventory = [];
+
+
 //LEVEL DATA OBJECTS
 
 let level0 = {
@@ -20,6 +27,21 @@ let level0 = {
   [0, 0, 0, 0, 0, 0, 0, 2, 3, 2], //0
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //1
   [0, 0, 0, 1, 0, 0, 0, 0, 0, 0], //2
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //3
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //4   1st VALUE (y)
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //5
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //6
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //7
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //8
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  //9
+],
+
+  itemMap: [
+  //       2nd Value (x)
+// 0  1  2  3  4  5   6  7  8  9
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //0
+  [0, 1, 0, 0, 0, 0, 0, 0, 0, 0], //1
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //2
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //3
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //4   1st VALUE (y)
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //5
@@ -147,6 +169,10 @@ function preload(){
   textures[3] = loadImage("door.png")
   textures[4] = loadImage("void_50x.png")
 
+  //item textures
+  itemTextures[0] = loadImage("void_50x.png")
+  itemTextures[1] = loadImage("stone.png")
+
   //sprite
   playerSprite = loadImage("librarian-bw.png")
    
@@ -164,6 +190,7 @@ function setup() {
 function loadLevel() {
   graphicsMap = levels[currentLevel].graphicsMap
   tileRules = levels[currentLevel].tileRules
+  itemMap = levels[currentLevel].itemMap
 
   //CREATING TILEMAP
   let tileID = 0; // ID number for a specific tile
@@ -181,6 +208,24 @@ function loadLevel() {
       tileID++;
     }
   }
+
+  //CREATING ITEMMAP
+
+  //nested loop that creates the tile map 
+  for (let tileX = 0; tileX < tilesX; tileX++) {
+    items[tileX] = []; //creates an empty column on the tilemap
+    for (let tileY = 0; tileY < tilesY; tileY++) {
+
+      //Set the texture for the tile
+      let itemTexture = itemMap[tileY][tileX];
+      let itemID = itemTexture
+        //creates a new tile from the tile class and puts it in the current column
+        items[tileX][tileY] = new Item(itemTextures[itemTexture], tileX, tileY, tileSize, itemID);
+
+        tileID++;
+      
+    }
+  }
 }
 
 function draw() {
@@ -192,6 +237,13 @@ function draw() {
       tileMap[tileX][tileY].display()
     }
   }
+
+  for (let tileX = 0; tileX < tilesX; tileX++){
+    for (let tileY = 0; tileY < tilesY; tileY++){
+      items[tileX][tileY].display()
+    }
+  }
+
   if (player.transition){
     //called once per frame to make a 30 second timer
     if (count === countMax) player.transition = false;
@@ -251,6 +303,31 @@ class Tile {
     image(stoneTile,this.xPos,this.yPos)
   }
 }
+
+class Item {
+  constructor(texture,tileX, tileY, tileSize, itemID){
+    //item texture
+    this.texture = texture;
+    //position on tile map
+    this.tileX = tileX;
+    this.tileY = tileY;
+    //pixel position on the canvas
+    this.xPos = this.tileX * tileSize;
+    this.yPos = this.tileY * tileSize;
+
+    this.tileSize = tileSize; //sets the item size
+    this.itemID = itemID; //Determines the type of idem
+    this.visible = true
+  }
+
+  display(){
+    if (this.visible){
+      noStroke()
+      image(this.texture,this.xPos,this.yPos,this.tileSize,this.tileSize)
+    }
+  }
+}
+
 
 class Player {
   constructor(sprite,startX,startY,tileSize,tileRule){
