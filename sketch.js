@@ -13,6 +13,7 @@ let textures = []; //value to store textures
 //Items and Inventory
 let items = [];
 let itemTextures = [];
+let itemTypeName = ["","Key"]
 
 let inventory = [];
 
@@ -54,7 +55,7 @@ let level0 = {
   tileRules: [
    //       2nd Value (x)
   // 0  1  2  3  4  5  6  7  8  9
-    [0, 0, 0, 0, 0, 0, 0, 1, 2, 1], //0
+    [0, 0, 0, 0, 0, 0, 0, 1, 4, 1], //0
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //1
     [0, 0, 0, 1, 0, 0, 0, 0, 0, 0], //2
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //3
@@ -104,6 +105,21 @@ let level1 = {
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 9
     ],
 
+    itemMap: [
+      //       2nd Value (x)
+    // 0  1  2  3  4  5   6  7  8  9
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //0
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //1
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //2
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //3
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //4   1st VALUE (y)
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //5
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //6
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //7
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //8
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  //9
+    ],
+
     startTiles: [
                 [1,5],
                 [8,5]
@@ -141,6 +157,21 @@ let level2 = {
         [1, 0, 0, 0, 0, 0, 1, 1, 0, 1], // 7
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 8
         [1, 1, 3, 1, 1, 1, 1, 1, 1, 1]  // 9
+    ],
+
+    itemMap: [
+      //       2nd Value (x)
+    // 0  1  2  3  4  5   6  7  8  9
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //0
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //1
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //2
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //3
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //4   1st VALUE (y)
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //5
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //6
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //7
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //8
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  //9
     ],
 
     startTiles: [
@@ -211,7 +242,7 @@ function loadLevel() {
 
   //CREATING ITEMMAP
 
-  //nested loop that creates the tile map 
+  //nested loop that creates the item map 
   for (let tileX = 0; tileX < tilesX; tileX++) {
     items[tileX] = []; //creates an empty column on the tilemap
     for (let tileY = 0; tileY < tilesY; tileY++) {
@@ -219,10 +250,14 @@ function loadLevel() {
       //Set the texture for the tile
       let itemTexture = itemMap[tileY][tileX];
       let itemID = itemTexture
+      let itemName = itemTypeName[itemID]
         //creates a new tile from the tile class and puts it in the current column
-        items[tileX][tileY] = new Item(itemTextures[itemTexture], tileX, tileY, tileSize, itemID);
-
-        tileID++;
+        if (itemID != 0){
+          items[tileX][tileY] = new Item(itemName,itemTextures[itemTexture], tileX, tileY, tileSize, itemID);
+        }
+        else{
+          items[tileX][tileY] = ""
+        }
       
     }
   }
@@ -240,7 +275,9 @@ function draw() {
 
   for (let tileX = 0; tileX < tilesX; tileX++){
     for (let tileY = 0; tileY < tilesY; tileY++){
-      items[tileX][tileY].display()
+      if (itemMap[tileX][tileY] != 0){
+        items[tileX][tileY].display()
+      }
     }
   }
 
@@ -253,6 +290,7 @@ function draw() {
 
   player.setDirection();
   player.move();
+  player.interact();
 
   //displays a message in each of the selected tiles
 }
@@ -305,7 +343,7 @@ class Tile {
 }
 
 class Item {
-  constructor(texture,tileX, tileY, tileSize, itemID){
+  constructor(name,texture,tileX, tileY, tileSize, itemID){
     //item texture
     this.texture = texture;
     //position on tile map
@@ -315,16 +353,15 @@ class Item {
     this.xPos = this.tileX * tileSize;
     this.yPos = this.tileY * tileSize;
 
+    //itemInfo
+    this.name = name;
     this.tileSize = tileSize; //sets the item size
-    this.itemID = itemID; //Determines the type of idem
-    this.visible = true
+    this.itemID = itemID; //Determines the type of item
   }
 
   display(){
-    if (this.visible){
-      noStroke()
-      image(this.texture,this.xPos,this.yPos,this.tileSize,this.tileSize)
-    }
+    noStroke()
+    image(this.texture,this.xPos,this.yPos,this.tileSize,this.tileSize)
   }
 }
 
@@ -354,6 +391,7 @@ class Player {
     //direction
     this.dirX = 0;
     this.dirY = 0;
+    this.facing = ""
 
     //movement
     this.isMoving = false;
@@ -377,24 +415,28 @@ class Player {
       if (keyIsDown(up)){
         this.dirX = 0;
         this.dirY = -1;
+        this.facing = "up";
       }
 
       //moves down
       if (keyIsDown(down)){
         this.dirX = 0;
         this.dirY = 1;
+        this.facing = "down";
       }
 
       //moves left
       if (keyIsDown(left)){
         this.dirX = -1;
         this.dirY = 0;
+        this.facing = "left";
       }
 
       //moves down
       if (keyIsDown(right)){
         this.dirX = 1;
         this.dirY = 0;
+        this.facing = "right";
       }
 
       //checks target tile
@@ -445,7 +487,9 @@ class Player {
           }
 
           //checks if next tile is not walkable
-          else if (tileRules[nextTileY][nextTileX] != 1){
+          else if (tileRules[nextTileY][nextTileX] != 1
+                    && tileRules[nextTileY][nextTileX] != 4 
+                    && itemMap[nextTileY][nextTileX] == 0){
             //next pixel positions
             this.tx = nextTileX * tileSize;
             this.ty = nextTileY * tileSize;
@@ -481,5 +525,82 @@ class Player {
 
     this.xPos = this.tileX * tileSize
     this.yPos = this.tileY * tileSize
+  }
+
+  interact(){
+    if (keyIsDown(69)){ //e
+
+      //Checks the tile above for items
+      if (this.facing == "up"){
+        let tileSelectedX = this.tileX 
+        let tileSelectedY = this.tileY - 1
+
+        //if there is an item, it is removed from the item map
+        //and placed into the inventory
+        if (itemMap[tileSelectedX][tileSelectedY] != 0){
+
+          itemMap[tileSelectedX][tileSelectedY] = 0
+          let itemValue = [items[tileSelectedX][tileSelectedY].name,items[tileSelectedX][tileSelectedY].itemID]
+          append(inventory,itemValue)
+          items[tileSelectedX][tileSelectedY] = ""
+
+          console.log("Inventory",inventory)
+        }
+      }
+
+      //Checks the tile below for items
+      if (this.facing == "down"){
+        let tileSelectedX = this.tileX 
+        let tileSelectedY = this.tileY + 1
+        
+        //if there is an item, it is removed from the item map
+        //and placed into the inventory
+        if (itemMap[tileSelectedX][tileSelectedY] != 0){
+
+          itemMap[tileSelectedX][tileSelectedY] = 0
+          let itemValue = [items[tileSelectedX][tileSelectedY].name,items[tileSelectedX][tileSelectedY].itemID]
+          append(inventory,itemValue)
+          items[tileSelectedX][tileSelectedY] = ""
+
+          console.log("Inventory",inventory)
+        }
+      }
+
+      //Checks the tile to the left for items
+      if (this.facing == "left"){
+        let tileSelectedX = this.tileX - 1
+        let tileSelectedY = this.tileY
+        
+        //if there is an item, it is removed from the item map
+        //and placed into the inventory
+        if (itemMap[tileSelectedX][tileSelectedY] != 0){
+
+          itemMap[tileSelectedX][tileSelectedY] = 0
+          let itemValue = [items[tileSelectedX][tileSelectedY].name,items[tileSelectedX][tileSelectedY].itemID]
+          append(inventory,itemValue)
+          items[tileSelectedX][tileSelectedY] = ""
+
+          console.log("Inventory",inventory)
+        }
+      }
+
+      //Checks the tile to the right for items
+      if (this.facing == "right"){
+        let tileSelectedX = this.tileX + 1
+        let tileSelectedY = this.tileY
+        
+        //if there is an item, it is removed from the item map
+        //and placed into the inventory
+        if (itemMap[tileSelectedX][tileSelectedY] != 0){
+
+          itemMap[tileSelectedX][tileSelectedY] = 0
+          let itemValue = [items[tileSelectedX][tileSelectedY].name,items[tileSelectedX][tileSelectedY].itemID]
+          append(inventory,itemValue)
+          items[tileSelectedX][tileSelectedY] = ""
+
+          console.log("Inventory",inventory)
+        }
+      }
+    }
   }
 }
